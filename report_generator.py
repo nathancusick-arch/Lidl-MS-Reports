@@ -20,8 +20,10 @@ from openpyxl.utils import get_column_letter
 MCO_ITEM = "Till Compliance"
 SCO_ITEM = "Till Compliance - SCO"
 REPORT_TIMEZONE = ZoneInfo("Europe/London")
-UTF8_BOM = b"\xef\xbb\xbf"
-MCO_HIDDEN_COLUMNS: tuple[str, ...] = ("BT", "BV", "BW", "CH")
+MCO_HIDDEN_COLUMNS: tuple[str, ...] = (
+    "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA",
+    "CB", "CC", "CD", "CE", "CF", "CG", "CH",
+)
 
 
 class ReportGenerationError(ValueError):
