@@ -755,7 +755,7 @@ def _abort_csv(frame: pd.DataFrame) -> bytes:
             "Abort reports are missing required source columns: " + ", ".join(missing)
         )
     text = frame.loc[:, ABORT_COLUMNS].to_csv(index=False, lineterminator="\r\n")
-    return UTF8_BOM + text.encode("utf-8")
+    return text.encode("utf-8-sig")
 
 
 def encrypt_xlsx(xlsx_bytes: bytes, password: str) -> bytes:
