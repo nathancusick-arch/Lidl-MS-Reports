@@ -32,7 +32,7 @@ st.caption(f"Output filenames will use the current month: **{current_period}**."
 def get_md_password() -> str | None:
     try:
         password = str(st.secrets["MD_PASSWORD"])
-    except Exception:
+    except KeyError:
         return None
     return password if password else None
 
