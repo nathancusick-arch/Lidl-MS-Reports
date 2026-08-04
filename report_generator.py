@@ -20,6 +20,8 @@ from openpyxl.utils import get_column_letter
 MCO_ITEM = "Till Compliance"
 SCO_ITEM = "Till Compliance - SCO"
 REPORT_TIMEZONE = ZoneInfo("Europe/London")
+UTF8_BOM = b"\xef\xbb\xbf"
+MCO_HIDDEN_COLUMNS: tuple[str, ...] = ("BT", "BV", "BW", "CH")
 
 
 class ReportGenerationError(ValueError):
@@ -704,6 +706,7 @@ def _write_workbook(
     widths: Sequence[float],
     font_name: str,
     zoom: int | None,
+    hidden_columns: Sequence[str] = (),
 ) -> bytes:
     workbook = Workbook()
     worksheet = workbook.active
@@ -736,6 +739,8 @@ def _write_workbook(
     last_column = get_column_letter(len(schema))
     last_row = max(2, len(frame) + 2)
     worksheet.auto_filter.ref = f"A2:{last_column}{last_row}"
+    for column in hidden_columns:
+        worksheet.column_dimensions[column].hidden = True
     workbook.active = 0
 
     output = io.BytesIO()
@@ -750,7 +755,7 @@ def _abort_csv(frame: pd.DataFrame) -> bytes:
             "Abort reports are missing required source columns: " + ", ".join(missing)
         )
     text = frame.loc[:, ABORT_COLUMNS].to_csv(index=False, lineterminator="\r\n")
-    return text.encode("utf-8-sig")
+    return UTF8_BOM + text.encode("utf-8")
 
 
 def encrypt_xlsx(xlsx_bytes: bytes, password: str) -> bytes:
@@ -869,6 +874,7 @@ def generate_reports(
         widths=MCO_WIDTHS,
         font_name="Calibri",
         zoom=85,
+        hidden_columns=MCO_HIDDEN_COLUMNS,
     )
     sco_xlsx = _write_workbook(
         sco_frame,
